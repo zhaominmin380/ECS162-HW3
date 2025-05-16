@@ -39,6 +39,8 @@ HMR state preservation comes with a number of gotchas! It has been disabled by d
 
 If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
 
+test
+
 ```ts
 // store.ts
 // An extremely simple external store
