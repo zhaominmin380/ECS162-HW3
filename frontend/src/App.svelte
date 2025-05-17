@@ -16,6 +16,91 @@
     .catch(error => {
       console.error('Error fetching news:', error);
     });
+
+  //'/api/comments', POST, testing
+  let content = '';
+  let articleUrl = 'https://example.com/test-article'; 
+  let result = '';
+
+  async function submitComment() {
+    const res = await fetch('/api/comments', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        article_url: articleUrl,
+        content: content,
+        parent_id: null
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      result = 'sucess：' + data._id;
+      content = '';
+    } else {
+      const err = await res.json();
+      result = 'error：' + (err.description || JSON.stringify(err));
+    }
+  }
+
+  // GET testing
+  let comments = [];
+  let commentsError = '';
+  let deleteResult = '';
+
+  async function fetchComments() {
+    commentsError = '';
+    try {
+      const res = await fetch(`/api/comments?article_url=${encodeURIComponent(articleUrl)}`);
+      if (res.ok) {
+        comments = await res.json();
+      } else {
+        const err = await res.json();
+        commentsError = err.error || JSON.stringify(err);
+      }
+    } catch (err) {
+      commentsError = 'Network error: ' + err.message;
+    }
+  }
+
+  // Delete testing
+  async function deleteComment(id) {
+    deleteResult = '';
+    try {
+      const res = await fetch(`/api/comments/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        fetchComments();
+      } else {
+        const err = await res.json();
+        deleteResult = 'Error deleting: ' + (err.error || JSON.stringify(err));
+      }
+    } catch (err) {
+      deleteResult = 'Network error: ' + err.message;
+    }
+  }
+
+  //login function
+    let user = null;
+
+  fetch('/api/user') 
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      user = data?.user ?? null;
+    });
+
+  function login() {
+    window.location.href = 'http://localhost:8000/login';
+  }
+
+  function logout() {
+    window.location.href = 'http://localhost:8000/logout';
+  }
 </script>
 
 <!-- Header -->
@@ -26,7 +111,18 @@
   <div class="title">
     <img src="/logo.png" alt="NYT Logo">
   </div>
-  <div class="right"></div>  
+  <div class="right">
+    <div id="auth-area">
+      {#if user}
+        <div class="user-info">
+          {user.email}
+          <button on:click={logout}>Log out</button>
+        </div>
+      {:else}
+        <button on:click={login}>Log in</button>
+      {/if}
+    </div>
+  </div>  
 </div>
 
 <!-- Main Grid Container -->
@@ -43,6 +139,30 @@
         <p>{news[0].abstract || news[0].snippet}</p>
         <a href={news[0].url} target="_blank">Read more</a>
       </article>
+
+      <!-- testing -->
+      <div class="comment-box">
+      <h3>test comments</h3>
+        <textarea bind:value={content} placeholder="Enter..."></textarea>
+        <button on:click={submitComment}>send</button>
+        {#if result}
+          <p>{result}</p>
+        {/if}
+        <button on:click={fetchComments}>Get Comments</button>
+        {#if deleteResult}
+          <p style="color: green;">{deleteResult}</p>
+        {/if}
+
+        {#if commentsError}
+          <p style="color: blue;">{commentsError}</p>
+        {/if}
+        <ul>
+          {#each comments as c}
+            <li>{c.content}</li>
+            <button on:click={() => deleteComment(c._id)}>Delete</button>
+          {/each}
+        </ul>
+      </div>
     {/if}
     <hr/>
   </div>
@@ -154,6 +274,14 @@
 /* blank so title will be in center*/
 .right {
     flex:1;
+    display:flex;
+    justify-content: flex-end;
+}
+
+#auth-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* grid container*/
