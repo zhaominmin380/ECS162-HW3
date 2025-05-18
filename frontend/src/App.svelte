@@ -1,4 +1,6 @@
 <script>
+  import CommentBox from './lib/CommentBox.svelte';
+
   let todayDate = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -17,72 +19,16 @@
       console.error('Error fetching news:', error);
     });
 
-  //'/api/comments', POST, testing
-  let content = '';
-  let articleUrl = 'https://example.com/test-article'; 
-  let result = '';
+  let sidebarOpen = false;
+  let selectedArticle = null;
 
-  async function submitComment() {
-    const res = await fetch('/api/comments', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        article_url: articleUrl,
-        content: content,
-        parent_id: null
-      })
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      result = 'sucess：' + data._id;
-      content = '';
-    } else {
-      const err = await res.json();
-      result = 'error：' + (err.description || JSON.stringify(err));
-    }
+  function openSidebar(article) {
+    selectedArticle = article;
+    sidebarOpen = true;
   }
 
-  // GET testing
-  let comments = [];
-  let commentsError = '';
-  let deleteResult = '';
-
-  async function fetchComments() {
-    commentsError = '';
-    try {
-      const res = await fetch(`/api/comments?article_url=${encodeURIComponent(articleUrl)}`);
-      if (res.ok) {
-        comments = await res.json();
-      } else {
-        const err = await res.json();
-        commentsError = err.error || JSON.stringify(err);
-      }
-    } catch (err) {
-      commentsError = 'Network error: ' + err.message;
-    }
-  }
-
-  // Delete testing
-  async function deleteComment(id) {
-    deleteResult = '';
-    try {
-      const res = await fetch(`/api/comments/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (res.ok) {
-        fetchComments();
-      } else {
-        const err = await res.json();
-        deleteResult = 'Error deleting: ' + (err.error || JSON.stringify(err));
-      }
-    } catch (err) {
-      deleteResult = 'Network error: ' + err.message;
-    }
+  function closeSidebar() {
+    sidebarOpen = false;
   }
 
   //login function
@@ -138,31 +84,10 @@
         <h2>{news[0].headline}</h2>
         <p>{news[0].abstract || news[0].snippet}</p>
         <a href={news[0].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[0])}>💬 Comments</button>
       </article>
-
+      
       <!-- testing -->
-      <div class="comment-box">
-      <h3>test comments</h3>
-        <textarea bind:value={content} placeholder="Enter..."></textarea>
-        <button on:click={submitComment}>send</button>
-        {#if result}
-          <p>{result}</p>
-        {/if}
-        <button on:click={fetchComments}>Get Comments</button>
-        {#if deleteResult}
-          <p style="color: green;">{deleteResult}</p>
-        {/if}
-
-        {#if commentsError}
-          <p style="color: blue;">{commentsError}</p>
-        {/if}
-        <ul>
-          {#each comments as c}
-            <li>{c.content}</li>
-            <button on:click={() => deleteComment(c._id)}>Delete</button>
-          {/each}
-        </ul>
-      </div>
     {/if}
     <hr/>
   </div>
@@ -177,9 +102,13 @@
         <h2>{news[1].headline}</h2>
         <p>{news[1].abstract || news[1].snippet}</p>
         <a href={news[1].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[1])}>💬 Comments</button>
       </article>
     {/if}
     <hr/>
+    {#if sidebarOpen}
+      <CommentBox article={selectedArticle} onClose={closeSidebar} />
+    {/if}
   </div>
 
   <!-- Middle Top Column -->
@@ -192,6 +121,7 @@
         <h2>{news[2].headline}</h2>
         <p>{news[2].abstract || news[2].snippet}</p>
         <a href={news[2].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[2])}>💬 Comments</button>
       </article>
     {/if}
     <hr/>
@@ -207,6 +137,7 @@
         <h2>{news[3].headline}</h2>
         <p>{news[3].abstract || news[3].snippet}</p>
         <a href={news[3].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[3])}>💬 Comments</button>
       </article>
     {/if}
     <hr/>
@@ -222,6 +153,7 @@
         <h2>{news[4].headline}</h2>
         <p>{news[4].abstract || news[4].snippet}</p>
         <a href={news[4].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[4])}>💬 Comments</button>
       </article>
     {/if}
     <hr/>
@@ -237,13 +169,12 @@
         <h2>{news[5].headline}</h2>
         <p>{news[5].abstract || news[5].snippet}</p>
         <a href={news[5].url} target="_blank">Read more</a>
+        <button on:click={() => openSidebar(news[5])}>💬 Comments</button>
       </article>
     {/if}
     <hr/>
   </div>
-
 </div>
-
 <hr/>
 
 <style>
