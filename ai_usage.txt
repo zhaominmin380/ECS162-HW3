@@ -1,0 +1,12 @@
+1. How to pass session across different host?
+2. Why can't I print in flask? 
+3. Should I implement authentical logic in backend?
+4. How to change mongo db Object type to string? include from bson import ObjectId
+5. Can I create a component to include all the logic I wrote in App.svelte?
+6. Can I pass parameter when using component?
+7. How to implement sidebar?
+8. How to let sidebar show on top of my page? (found the new skills: box-shadow, really cool)
+9. How can I reply to others replies? 
+10. Is it possible to use recursive in component?
+11. Why my content cannot show up when I reply?
+12. How to mock post method in vitest?
