@@ -28,7 +28,7 @@
   {/if}
 
   <div class="replies">
-    <!-- loop through all childrens -->
+    <!-- recursive itself if any child -->
     {#each comment.children as child}
       <Reply
         comment={child}

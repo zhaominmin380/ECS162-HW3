@@ -57,12 +57,12 @@ def authorize():
 
     user_info = oauth.flask_app.parse_id_token(token, nonce=nonce)  # or use .get('userinfo').json()
     session['user'] = user_info
-    return redirect('http://localhost:5173')
+    return redirect('/')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect('http://localhost:5173')
+    return redirect('/')
 
 # check if user login
 @app.route('/api/user')
@@ -100,7 +100,7 @@ def post_comment():
 def get_comments():
     article_url = request.args.get('article_url')
     if not article_url:
-        return jsonify({'error': 'Missing article_url parameter'}), 400
+        return jsonify({'error': 'Missing article url'}), 400
 
     cursor = comments_col.find({
         "article_url": article_url,
