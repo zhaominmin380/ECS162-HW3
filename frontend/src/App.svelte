@@ -19,19 +19,22 @@
       console.error('Error fetching news:', error);
     });
 
+  // Sidebar Setup
   let sidebarOpen = false;
   let selectedArticle = null;
 
+  // open sidebar when clicking comment button in the article
   function openSidebar(article) {
     selectedArticle = article;
     sidebarOpen = true;
   }
 
+  // close sidebar
   function closeSidebar() {
     sidebarOpen = false;
   }
 
-  //login function
+  // Login function 
     let user = null;
 
   fetch('/api/user') 
@@ -83,8 +86,10 @@
       <article>
         <h2>{news[0].headline}</h2>
         <p>{news[0].abstract || news[0].snippet}</p>
-        <a href={news[0].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[0])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[0].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[0])}>💬 Comments</button>
+        </div>
       </article>
       
       <!-- testing -->
@@ -101,8 +106,10 @@
       <article>
         <h2>{news[1].headline}</h2>
         <p>{news[1].abstract || news[1].snippet}</p>
-        <a href={news[1].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[1])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[1].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[1])}>💬 Comments</button>
+        </div>
       </article>
     {/if}
     <hr/>
@@ -120,8 +127,10 @@
       <article>
         <h2>{news[2].headline}</h2>
         <p>{news[2].abstract || news[2].snippet}</p>
-        <a href={news[2].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[2])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[2].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[2])}>💬 Comments</button>
+        </div>
       </article>
     {/if}
     <hr/>
@@ -136,8 +145,10 @@
       <article>
         <h2>{news[3].headline}</h2>
         <p>{news[3].abstract || news[3].snippet}</p>
-        <a href={news[3].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[3])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[3].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[3])}>💬 Comments</button>
+        </div>
       </article>
     {/if}
     <hr/>
@@ -152,8 +163,10 @@
       <article>
         <h2>{news[4].headline}</h2>
         <p>{news[4].abstract || news[4].snippet}</p>
-        <a href={news[4].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[4])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[4].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[4])}>💬 Comments</button>
+        </div>
       </article>
     {/if}
     <hr/>
@@ -168,8 +181,10 @@
       <article>
         <h2>{news[5].headline}</h2>
         <p>{news[5].abstract || news[5].snippet}</p>
-        <a href={news[5].url} target="_blank">Read more</a>
-        <button on:click={() => openSidebar(news[5])}>💬 Comments</button>
+        <div class="click">
+          <a href={news[5].url} target="_blank">Read more</a>
+          <button on:click={() => openSidebar(news[5])}>💬 Comments</button>
+        </div>
       </article>
     {/if}
     <hr/>
@@ -215,6 +230,12 @@
   gap: 10px;
 }
 
+.click {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
 /* grid container*/
 .main {
     display:grid;

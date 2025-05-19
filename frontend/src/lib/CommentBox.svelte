@@ -7,7 +7,8 @@
     let comments = [];
     let content = '';
     let reply = null;
-    
+
+    // nested comment algo
     function nestComments(comments) {
         const map = {};
         const roots = [];
@@ -18,7 +19,12 @@
         });
 
         comments.forEach(c => {
-            const pid = c.parent_id && String(c.parent_id);
+            let pid;
+            if (c.parent_id) {
+              pid = String(c.parent_id);
+            } else {
+              pid = undefined;  
+            }
             if (pid && map[pid]) {
                 map[pid].children.push(c);
             } else {
@@ -29,6 +35,7 @@
         return roots;
     }
 
+    // count both comment and reply
     function countAll(comments) {
         let count = 0;
         for (const c of comments) {
@@ -40,13 +47,20 @@
         return count;
     }
 
+    // get comment already in article
     async function fetchComments() {
         const res = await fetch(`/api/comments?article_url=${encodeURIComponent(article.url)}`);
-        const flat = res.ok ? await res.json() : [];
+        let flat;
+        if (res.ok) {
+          flat = await res.json();
+        } else {
+          flat = [];
+        }
         comments = nestComments(flat);
-        console.log('nesting:', nestComments(flat));
+        //console.log('nesting:', nestComments(flat));
     }
 
+    // submit comment or reply
     async function submitComment(parentId, content) {
             const res = await fetch('/api/comments', {
             method: 'POST',
@@ -61,24 +75,30 @@
         if (res.ok) {
             reply = null;
             fetchComments();
+        }else{
+          const err = await res.json();
+          alert(err?.error);
+        }
+    }
+   
+    // delete comment (moderator  only)
+    async function deleteComment(id) {
+        const res = await fetch(`/api/comments/${id}`, { method: 'DELETE' });
+        if (res.ok){
+          fetchComments();
+        }else{
+          const err = await res.json();
+          alert(err?.error);
         }
     }
 
-    async function deleteComment(id) {
-        const res = await fetch(`/api/comments/${id}`, { method: 'DELETE' });
-        if (res.ok) fetchComments();
-    }
-
+    // refresh when different article
     $: if (article) {
         fetchComments(); 
     }
 
     function setReply(id) {
         reply = id;
-    }
-
-    function setContent(val) {
-        content = val;
     }
 
 </script>
@@ -92,10 +112,15 @@
   <div class="sidebar-comments">
     <h3>Comments <span>{countAll(comments)}</span></h3>
 
+    <!-- comment byself -->
     {#if !reply}
         <input type="text" placeholder="Share your thoughts..." bind:value={content} />
-        <button on:click={() => submitComment(null)}>Send</button>
+        <div class="button">
+          <button on:click={() => {submitComment(null, content); content="";}}>Send</button>
+        </div>
     {/if}
+
+    <!-- nested comment -->
     {#each comments as c}
         <Reply
             comment={c}
@@ -103,11 +128,8 @@
             {setReply}
             {submitComment}
             {deleteComment}
-            {content}
-            {setContent}
         />
     {/each}
-
 
   </div>
 </div>
@@ -141,23 +163,21 @@
   }
 
   .sidebar-comments input {
-    width: 100%;
+    display:flex;
+    justify-content: center;
+    width: 90%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
   }
 
-  .comment {
-    margin-bottom: 12px;
-    padding: 6px;
-    border-bottom: 1px solid #eee;
+  .button {
+    display:flex;
+    justify-content: flex-end;
   }
 
-  .comment .delete {
-    font-size: 12px;
-    color: blue;
-    background: none;
-    border: none;
-    cursor: pointer;
+  .button > button{
+    font-size:0.7em;
   }
+
 </style>
